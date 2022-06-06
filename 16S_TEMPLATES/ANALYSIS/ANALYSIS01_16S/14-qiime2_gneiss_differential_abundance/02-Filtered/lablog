@@ -1,0 +1,9 @@
+# 14-qiime2_gneiss_differential_abundance/02-Filtered
+echo "qsub -V -b y -j y -cwd -N Q2_GNEISS_FILT_HIERARCHY -q all.q@obelix09,all.q@obelix10,all.q@obelix11,all.q@obelix12,all.q@obelix13,all.q@obelix14,all.q@obelix15 qiime gneiss correlation-clustering --i-table ../../08-qiime2_filt_mit_chl/feature_table_filtered.qza --o-clustering hierarchy_filtered.qza" > _01_qiime_gneiss_build_hierarchy_filt.sh
+head -n 1 ../../metadata.tsv | xargs -n1 | tail -n +2 | xargs -I % echo "qsub -V -b y -j y -cwd -N Q2_GNEISS_FILT_% -q all.q@obelix09,all.q@obelix10,all.q@obelix11,all.q@obelix12,all.q@obelix13,all.q@obelix14,all.q@obelix15 qiime gneiss dendrogram-heatmap --i-table ../../08-qiime2_filt_mit_chl/feature_table_filtered.qza --i-tree hierarchy_filtered.qza --m-metadata-file ../../metadata.tsv --m-metadata-column % --p-color-map seismic --o-visualization heatmap_%_filtered.qzv" > _02_qiime_gneiss_heatmap_filt.sh
+for i in {1..7};
+do
+    mkdir -p "lvl_${i}"
+    echo "qsub -V -b y -j y -cwd -N Q2_GNEISS_FILT_HIERARCHY_${i} -q all.q@obelix09,all.q@obelix10,all.q@obelix11,all.q@obelix12,all.q@obelix13,all.q@obelix14,all.q@obelix15 qiime gneiss correlation-clustering --i-table ../../10-qiime2_absoluteNumbers/02-Filtered/lvl_${i}/collapsed_raw_filt_table_lvl_${i}.qza --o-clustering lvl_${i}/hierarchy_filt_${i}.qza" >> _01_qiime_gneiss_build_hierarchy_filt.sh
+    head -n 1 ../../metadata.tsv | xargs -n1 | tail -n +2 | xargs -I % echo "qsub -V -b y -j y -cwd -N Q2_GNEISS_DEND_FILT_%_${i} -q all.q@obelix09,all.q@obelix10,all.q@obelix11,all.q@obelix12,all.q@obelix13,all.q@obelix14,all.q@obelix15 qiime gneiss dendrogram-heatmap --i-table ../../10-qiime2_absoluteNumbers/02-Filtered/lvl_${i}/collapsed_raw_filt_table_lvl_${i}.qza --i-tree lvl_${i}/hierarchy_filt_${i}.qza --m-metadata-file ../../metadata.tsv --m-metadata-column % --p-color-map seismic --o-visualization lvl_${i}/heatmap_%_filt_lvl_${i}.qzv" >> _02_qiime_gneiss_heatmap_filt.sh
+done

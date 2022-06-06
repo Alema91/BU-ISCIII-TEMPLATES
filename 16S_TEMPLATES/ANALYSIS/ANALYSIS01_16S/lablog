@@ -1,0 +1,34 @@
+mkdir 01-fastQC_previous	
+mkdir 02-cutadapt_remove_primers	
+mkdir 03-fastp_preprocess	
+mkdir 04-fastQC_posterior	
+mkdir 05-qiime2_import	
+mkdir 06-qiime2_denoise_cluster	
+mkdir 07-qiime2_taxonomy	
+mkdir 08-qiime2_filt_mit_chl	
+mkdir 09-qiime2_taxabarplots
+mkdir 09-qiime2_taxabarplots/01-Full
+mkdir 09-qiime2_taxabarplots/02-Filtered
+mkdir 10-qiime2_absoluteNumbers
+mkdir 10-qiime2_absoluteNumbers/01-Full
+mkdir 10-qiime2_absoluteNumbers/02-Filtered
+mkdir 11-qiime2_phylogeny
+mkdir 11-qiime2_phylogeny/01-Full
+mkdir 11-qiime2_phylogeny/02-Filtered
+mkdir 12-qiime2_diversity
+mkdir 12-qiime2_diversity/01-Full
+mkdir 12-qiime2_diversity/02-Filtered
+mkdir 13-qiime2_rarefaction
+mkdir 13-qiime2_rarefaction/01-Full
+mkdir 13-qiime2_rarefaction/02-Filtered
+mkdir 14-qiime2_gneiss_differential_abundance
+mkdir 14-qiime2_gneiss_differential_abundance/01-Full
+mkdir 14-qiime2_gneiss_differential_abundance/02-Filtered
+mkdir 15-qiime2_ANCOM
+mkdir 15-qiime2_ANCOM/01-Full
+mkdir 15-qiime2_ANCOM/02-Filtered
+mkdir 99-stats
+ln -s ../00-reads .
+ln -s ../samples_id.txt .
+ln -s ../manifest.tsv .
+ln -s ../metadata.tsv .

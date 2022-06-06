@@ -1,0 +1,7 @@
+for i in {1..7};
+do
+    mkdir -p "lvl_${i}"
+    echo "qsub -V -b y -j y -cwd -N Q2_COLLAPSE_FULL_TABLE_${i} -q all.q@obelix09,all.q@obelix10,all.q@obelix11,all.q@obelix12,all.q@obelix13,all.q@obelix14,all.q@obelix15 qiime taxa collapse --i-table ../../06-qiime2_denoise_cluster/feature_table_full.qza --i-taxonomy ../../07-qiime2_taxonomy/taxonomy.qza --p-level ${i} --o-collapsed-table lvl_${i}/collapsed_raw_full_table_lvl_${i}.qza" >> _01_qiime2_collapse_table.sh
+    echo "qsub -V -b y -j y -cwd -N Q2_VISUAL_FULL_COLLAPSED_TABLE_${i} -q all.q@obelix09,all.q@obelix10,all.q@obelix11,all.q@obelix12,all.q@obelix13,all.q@obelix14,all.q@obelix15 qiime metadata tabulate --m-input-file lvl_${i}/collapsed_raw_full_table_lvl_${i}.qza --o-visualization lvl_${i}/colapsed_raw_full_table_lvl_${i}.qzv" >> _02_qiime2_visual_collapsed_tables.sh
+done
+

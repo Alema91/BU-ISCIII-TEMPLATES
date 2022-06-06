@@ -1,0 +1,11 @@
+mkdir fastqc_pre
+mkdir fastp
+mkdir fastqc_post
+mkdir logs
+
+ln -s ../01-fastQC_pre/*/*.zip fastqc_pre
+ln -s ../02-fastp_trimming/*/*.json fastp
+ln -s ../03-fastQC_post/*/*.zip fastqc_post
+
+scratch_dir=$(echo $(pwd) | sed "s@/data/bi/scratch_tmp/@/scratch/@g")
+cat ../samples_id.txt | xargs -I % echo "mkdir %; srun --partition middle_idx --cpus-per-task 1 --chdir $scratch_dir multiqc . 2> logs/multiqc.log &" > _01_multiqc.sh

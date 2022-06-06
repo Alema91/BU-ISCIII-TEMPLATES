@@ -1,0 +1,4 @@
+2021-12-21 12:44:30,373 - utils.common_functions - INFO - Connecting to http://rest.pubmlst.org/ to get the options.
+2021-12-21 12:44:45,719 - utils.common_functions - INFO - Connecting to http://rest.pubmlst.org/db/pubmlst_escherichia_seqdef to get the options.
+2021-12-21 12:44:45,899 - utils.common_functions - INFO - Connecting to http://rest.pubmlst.org/db/pubmlst_escherichia_seqdef/schemes to get the options.
+2021-12-21 12:44:49,999 - utils.common_functions - INFO - Connecting to http://rest.pubmlst.org/db/pubmlst_escherichia_seqdef/schemes/1 to get the options.

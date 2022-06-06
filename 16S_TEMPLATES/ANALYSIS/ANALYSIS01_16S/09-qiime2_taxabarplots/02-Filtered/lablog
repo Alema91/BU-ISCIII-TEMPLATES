@@ -1,0 +1,4 @@
+# 09-qiime2_taxabarplots/02-Filtered
+# Generates the visual file with the barplot for the filtered feature tables
+# conda activate qiime2021.2
+echo "qsub -V -b y -j y -cwd -N Q2_BARPLOT_FILT -q all.q@obelix09,all.q@obelix10,all.q@obelix11,all.q@obelix12,all.q@obelix13,all.q@obelix14,all.q@obelix15 qiime taxa barplot --i-table ../../08-qiime2_filt_mit_chl/feature_table_filtered.qza --i-taxonomy ../../07-qiime2_taxonomy/taxonomy.qza --m-metadata-file ../../metadata.tsv --o-visualization taxa_barplots_filtered.qzv" > _01_qiime2_filter_taxa_barplots.sh

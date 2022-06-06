@@ -1,0 +1,5 @@
+# 01-fastQC_previous
+# fastQC to assess the raw reads quality
+# conda activate quality_control
+cat ../samples_id.txt | xargs -I % echo "mkdir %; qsub -V -b y -j y -cwd -N PRE_FQC_% -q all.q@obelix05,all.q@obelix06,all.q@obelix07,all.q@obelix08,all.q@obelix09,all.q@obelix10 fastqc -o % ../00-reads/%*.fastq.gz" > _01_fastqc_pre_trimming.sh
+

@@ -1,0 +1,13 @@
+# ANALYSIS
+# Please don't run this very script at 23:59, just in case
+# Generates the directory where the analysis will be held
+# Generates the sample name list
+# Generates the directory with renamed links for each read
+# Generates the manifest file to import the sequences to qiime2
+mkdir -p $(date '+%Y%m%d')_ANALYSIS01_16S
+ls ../RAW/*.gz | cut -d "/" -f3 | cut -d "_" -f1 | sort -u > samples_id.txt
+mkdir -p 00-reads
+cd 00-reads; cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R1*.fastq.gz %_R1.fastq.gz" | bash;
+cat ../samples_id.txt | xargs -I % echo "ln -s ../../RAW/%_*R2*.fastq.gz %_R2.fastq.gz" | bash; cd -
+printf "sample-id\tforward-absolute-filepath\treverse-absolute-filepath\n" > manifest.tsv
+cat samples_id.txt | xargs -I % printf "%\t$(pwd)/$(date '+%Y%m%d')_ANALYSIS01_16S/03-fastp_preprocess/%/%_R1_filtered.fq.gz\t$(pwd)/$(date '+%Y%m%d')_ANALYSIS01_16S/03-fastp_preprocess/%/%_R2_filtered.fq.gz\n" >> manifest.tsv 

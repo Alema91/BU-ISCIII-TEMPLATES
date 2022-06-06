@@ -1,0 +1,28 @@
+##!/bin/bash
+# ARIBA runs local assembli/processing_Data/bioinformatics/services_and_colaborations/CNM/bacteriologia/20190821_QCASSEMBLT_s.gonzalez_T/RAW/fastqc_2/.
+
+
+for sample in $(cat ../../samples_id_failed.txt); do
+
+    mkdir "$sample"
+
+    for db in $(cat ../databases.txt); do
+
+    echo "qsub -V -b y -j y -cwd -N ARIBA.${sample} -q all.q@obelix14,all.q@obelix15,all.q@obelix16 ariba run \/data\/bi\/references\/ariba\/20211216/\"$db\"/out.\"$db\".prepareref ../../02-preprocessing/$sample/$sample\"_R1_filtered.fastq.gz\" ../../02-preprocessing/$sample/$sample\"_R2_filtered.fastq.gz\" \"$sample\"/out.\"$db\"\"$sample\"run" >> _02_run_ariba_$db".sh"
+
+    done
+
+done
+
+#Add the sample ID and the database used in the report.tsv file name.
+
+folder_run="."
+
+for db in $(cat ../databases.txt); do
+
+
+        cat ../../samples_id_failed.txt | xargs -I % echo "mv "$folder_run"/%/out."$db"%run/report.tsv "$folder_run"/%/out."$db"%run/%"$db"report.tsv" >> _01_fix_tsvreport.sh
+
+done
+
+

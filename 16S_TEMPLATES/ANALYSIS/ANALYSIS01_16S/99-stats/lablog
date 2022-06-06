@@ -1,0 +1,11 @@
+# 99-stats
+# bring necessary files
+ln -s /data/bi/pipelines/16S-Qiime-protocol/generate_read_balance.py generate_read_balance.py
+ln -s ../01-fastQC_previous .
+ln -s ../02-cutadapt_remove_primers .
+ln -s ../03-fastp_preprocess .
+ln -s ../04-fastQC_posterior .
+# multiQC to assess the general quality of the reads
+echo "qsub -V -b y -j y -cwd -N MULTIQC -q all.q@obelix09,all.q@obelix10,all.q@obelix11,all.q@obelix12,all.q@obelix13,all.q@obelix14,all.q@obelix15 multiqc . -o ." > _01_multiqc.sh 
+# generate the read balance with the ad-hoc python script
+echo "qsub -V -b y -j y -cwd -N READ_BALANCE -q all.q@obelix09,all.q@obelix10,all.q@obelix11,all.q@obelix12,all.q@obelix13,all.q@obelix14,all.q@obelix15 python generate_read_balance.py multiqc_data/multiqc_data.json stats.tsv" > _02_read_balance.sh

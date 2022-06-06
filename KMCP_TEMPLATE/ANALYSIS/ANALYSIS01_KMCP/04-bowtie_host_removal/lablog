@@ -1,0 +1,13 @@
+# srun parameters
+scratch_dir=$(echo $(pwd) | sed "s@/data/bi/scratch_tmp/@/scratch/@g")
+mkdir logs
+
+# Create the index from the fasta files
+mkdir human_db
+echo "srun --partition middle_idx --chdir $scratch_dir --mem 10000 --output logs/bowtie2_index_construction.log bowtie2-build /data/bi/references/BLAST_dbs/Human_20220519/GCA_009914755.4_T2T-CHM13v2.0_genomic.fna.gz ./human_db" > _01_create_database.sh
+
+
+cat ../samples_id.txt | xargs -I % echo "mkdir %" > _02_bowtie_map_host.sh
+cat ../samples_id.txt | xargs -I % echo "srun --partition short_idx --chdir $scratch_dir --output logs/BOWTIE_%.log bowtie2 -x human_db/human_db -1 ../01-preprocessing/%/%_R1_filtered.fastq.gz -2 ../02-fastp_trimming/%/%_R2_filtered.fastq.gz -S %/%.sam ">> _02_bowtie_map_host.sh
+cat ../samples_id.txt | xargs -I % echo "srun --partition short_idx --chdir $scratch_dir --output logs/SAMTOOLSVIEW_%.log samtools view -buS -f 4 -o %/%.bam %/%.sam &" > _03_samtools_view.sh
+cat ../samples_id.txt | xargs -I % echo "srun --partition short_idx --chdir $scratch_dir --output logs/SAMTOOLSVIEW_%.log samtools fastq -1 %/%_R1_filt_host_removed.fastq.gz -2 %/%_R2_filt_host_removed.fastq.gz %/%.bam &" > _04_samtools_fastq.sh

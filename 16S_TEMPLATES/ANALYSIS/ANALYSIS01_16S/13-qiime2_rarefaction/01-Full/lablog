@@ -1,0 +1,6 @@
+# 13-qiime2_rarefaction/01-Full
+# Calculates the rarefaction curve for the full (unfiltered) table
+# Must be provided with a number for max-depth, extracted from the full summarized table
+# conda activate qiime2021.2
+echo "qsub -V -b y -j y -cwd -N Q2_RAREFACTION_FULL -q all.q@obelix09,all.q@obelix10,all.q@obelix11,all.q@obelix12,all.q@obelix13,all.q@obelix14,all.q@obelix15 qiime diversity alpha-rarefaction --i-table ../../06-qiime2_denoise_cluster/feature_table_full.qza --i-phylogeny ../../11-qiime2_phylogeny/01-Full/rooted_tree_full.qza --p-max-depth $1 --p-metrics shannon faith_pd pielou_e simpson observed_features dominance enspie --m-metadata-file ../../metadata.tsv --o-visualization alpha_rarefaction_full.qzv" > _01_qiime2_alpha_rarefaction.sh
+

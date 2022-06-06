@@ -1,0 +1,8 @@
+ln -s ../samples_id.txt .
+
+mkdir 01-fastqc_pre
+mkdir 02-fastp_trimming
+mkdir 03-fastqc_post
+mkdir 04-bowtie_host_removal
+mkdir 05-kmcp
+mkdir 99-stats

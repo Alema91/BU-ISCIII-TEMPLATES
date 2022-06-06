@@ -1,0 +1,10 @@
+ln -s ../00-reads .
+ln -s ../samples_id.txt .
+
+mkdir 01-fastQC-pre
+mkdir 02-fastp-trim
+mkdir 03-fastQC-post
+mkdir 04-mlst
+mkdir 05-ariba
+mkdir 99-stats
+

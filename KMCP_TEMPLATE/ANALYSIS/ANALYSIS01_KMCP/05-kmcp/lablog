@@ -1,0 +1,8 @@
+# conda activate KMCP
+mkdir logs
+
+scratch_dir=$(echo $(pwd) | sed "s@/data/bi/scratch_tmp/@/scratch/@g")
+DATABASE="/data/bi/references/KMCP/humgut/"
+
+cat ../samples_id.txt | xargs -I % echo "mkdir %; srun --partition middle_idx --chdir $scratch_dir kmcp search --threads 5 --db-dir $DATABASE/humgut_kmcp --min-kmers 10 --min-query-len 30 --min-query-cov 0.55 ../02-host_removal/%/%_R1_filt_host_removed.fastq.gz ../02-host_removal/%/%_R2_filt_host_removed.fastq.gz --out-file %/KMCP_%_result.tsv.gz --log %/KMCP_%_GTDB.log &" >> _01_kmcp_search.sh
+cat ../samples_id.txt | xargs -I % echo "srun --partition middle_idx --chdir $scratch_dir kmcp profile --taxid-map ${DATABASE}/humgut_kmcp/taxid.map --taxdump ${DATABASE}/humgut_taxdump --level species --min-query-cov 0.55 --min-chunks-reads 50 --min-chunks-fraction 0.8 --max-chunks-depth-stdev 2 --min-uniq-reads 20 --min-hic-ureads 5 --min-hic-ureads-qcov 0.75 --min-hic-ureads-prop 0.1 %/KMCP_%_result.tsv.gz --out-prefix %/%.profile --metaphlan-report %/%_metaphlan.profile --cami-report %/%_cami.profile --sample-id % --binning-result %/%.binning.gz &" > _02_kmcp_profile.sh
