@@ -1,3 +1,5 @@
 ## SRST2 for all the samples against Argannot.r1
 scratch_dir=$(echo $(pwd) | sed "s@/data/bi/scratch_tmp/@/scratch/@g")
-cat ../samples_id.txt | xargs -I % echo "mkdir %; srun --partition middle_idx --cpus-per-task 5 --chdir $scratch_dir srst2 --input_pe ../02-fastp-trim/%/%_trimmed_R1.fastq.gz ../02-fastp-trim/%/%_trimmed_R1.fastq.gz --forward _trimmed_R1 --reverse _trimmed_R2 --threads 5  --log --output %/%_mlst --mlst_db ../../../REFERENCES/ecoli_achtman_mlst.fasta --mlst_definitions ../../../REFERENCES/ecoli_achtman_mlst.profile --mlst_delimiter '_' 2> %/%_mlst.log &" > _01_srst2_mlst.sh
+cat ../samples_id.txt | xargs -I % echo "mkdir %; srun --partition middle_idx --cpus-per-task 5 --chdir $scratch_dir srst2 --input_pe ../02-fastp-trim/%/%_trimmed_R1.fastq.gz ../02-fastp-trim/%/%_trimmed_R1.fastq.gz --forward _trimmed_R1 --reverse _trimmed_R2 --threads 5  --log --output %/%_mlst --mlst_db ../../../REFERENCES/ecoli_achtman_mlst.fasta --mlst_definitions ../../../REFERENCES/ecoli_achtman_mlst.profile --mlst_delimiter '_' &" > _01_srst2_mlst.sh
+
+echo "mkdir summary; srun --partition middle_idx --cpus-per-task 5 --chdir $scratch_dir srst2 --prev_output */*__results.txt --output summary/mlst_report" > _02_srst2_summary
