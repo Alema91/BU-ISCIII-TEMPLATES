@@ -1,6 +1,8 @@
 ln -s ../00-reads .
 ln -s ../samples_id.txt .
 
+mkdir 05-mtbseq
+
 echo "sample,fastq_1,fastq_2" > samplesheet.csv
 cat samples_id.txt | while read in; do echo "${in},00-reads/${in}_R1.fastq.gz,00-reads/${in}_R2.fastq.gz"; done >> samplesheet.csv
 
