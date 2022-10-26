@@ -3,15 +3,15 @@ mkdir logs
 scratch_dir=$(echo $(pwd) | sed 's@/data/bi/scratch_tmp/@/scratch/@g')
 
 # header:
-# 1: stitle
-# 2: qaccver
-# 3: saccver
-# 4: pident
-# 5: length
-# 6: ismatch
-# 7: gapopen
-# 8: qstart
-# 9: qend
+#  1: stitle
+#  2: qaccver
+#  3: saccver
+#  4: pident
+#  5: length
+#  6: ismatch
+#  7: gapopen
+#  8: qstart
+#  9: qend
 # 10: sstart
 # 11: send
 # 12: evalue
