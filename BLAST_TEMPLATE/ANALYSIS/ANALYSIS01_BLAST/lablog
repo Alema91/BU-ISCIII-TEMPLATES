@@ -1,0 +1,41 @@
+#module load BLAST
+mkdir logs
+scratch_dir=$(echo $(pwd) | sed 's@/data/bi/scratch_tmp/@/scratch/@g')
+
+# header:
+# 1: stitle
+# 2: qaccver
+# 3: saccver
+# 4: pident
+# 5: length
+# 6: ismatch
+# 7: gapopen
+# 8: qstart
+# 9: qend
+# 10: sstart
+# 11: send
+# 12: evalue
+# 13: bitscore
+# 14: slen
+# 15: qlen
+# 16: qcovs
+# 17: %cgAligned
+# 18: %refCovered
+
+
+echo -e "stitle\tqaccver\tsaccver\tpident\tlength\tmismatch\tgapopen\tqstart\tqend\tsstart\tsend\tevalue\tbitscore\tslen\tqlen\tqcovs\t%cgAligned\t%refCovered" > header
+
+
+cat ../samples_id.txt | while read in; do ASSEMBLY=$(find ../*viralrecon/assembly/spades/meta/${in}.scaffolds.fa); echo "srun --chdir ${scratch_dir} --job-name BLAST_scaffolds.${in} --output logs/BLAST_scaffolds.${in}.%j.log --cpus-per-task 10 blastn -num_threads 10 -db /data/bi/references/virus/BLAST/all_virus.fasta -query ${ASSEMBLY} -outfmt \"6 stitle std slen qlen qcovs\" -out ${in}_scaffolds.blast.txt &"; done > _01_blast.sh
+cat ../samples_id.txt | while read in; do ASSEMBLY=$(find ../*viralrecon/assembly/spades/meta/${in}.contigs.fa); echo "srun --chdir ${scratch_dir} --job-name BLAST_contigs.${in} --output logs/BLAST_contigs.${in}.%j.log --cpus-per-task 10 blastn -num_threads 10 -db /data/bi/references/virus/BLAST/all_virus.fasta -query ${ASSEMBLY} -outfmt \"6 stitle std slen qlen qcovs\" -out ${in}_contigs.blast.txt &"; done >> _01_blast.sh
+
+
+cat ../samples_id.txt | while read in; do echo "awk 'BEGIN{OFS=\"\t\";FS=\"\t\"}{print \$0,\$5/\$15,\$5/\$14}' ${in}_scaffolds.blast.txt | awk 'BEGIN{OFS=\"\t\";FS=\"\t\"} \$15 > 200 && \$17 > 0.7 && \$1 !~ /phage/ {print \$0}' > ${in}.blast_scaffolds.filt.txt"; done > _02_filt_blast.sh
+cat ../samples_id.txt | while read in; do echo "awk 'BEGIN{OFS=\"\t\";FS=\"\t\"}{print \$0,\$5/\$15,\$5/\$14}' ${in}_contigs.blast.txt | awk 'BEGIN{OFS=\"\t\";FS=\"\t\"} \$15 > 200 && \$17 > 0.7 && \$1 !~ /phage/ {print \$0}' > ${in}.blast_contigs.filt.txt"; done >> _02_filt_blast.sh
+
+
+cat ../samples_id.txt | while read in; do echo "cat header ${in}.blast_scaffolds.filt.txt > ${in}_scaffolds.blast.filt.header.txt";done > _03_header.sh
+cat ../samples_id.txt | while read in; do echo "cat header ${in}.blast_contigs.filt.txt > ${in}_contigs.blast.filt.header.txt";done >> _03_header.sh
+
+cat ../samples_id.txt | while read in; do echo "cat header ${in}_scaffolds.blast.txt > ${in}_scaffolds.blast.raw.header.txt";done >> _03_header.sh
+cat ../samples_id.txt | while read in; do echo "cat header ${in}_contigs.blast.txt > ${in}_contigs.blast.raw.header.txt";done >> _03_header.sh
