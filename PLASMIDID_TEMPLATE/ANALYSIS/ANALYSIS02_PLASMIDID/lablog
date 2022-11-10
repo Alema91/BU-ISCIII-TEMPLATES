@@ -1,6 +1,7 @@
 
 mkdir logs
 scratch_dir=$(echo $PWD | sed 's/\/data\/bi\/scratch_tmp/\/scratch/g')
+ln -s ../samples_id.txt .
 
 # module load singularity
 
