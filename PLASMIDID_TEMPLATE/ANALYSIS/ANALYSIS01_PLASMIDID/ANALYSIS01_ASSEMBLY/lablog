@@ -35,14 +35,11 @@ nextflow run /scratch/bi/pipelines/BU_ISCIII-bacterial-assembly/main.nf \\
           --outdir ./ \\
           --cut_mean_quality 20 \\
           --qualified_quality_phred 20 \\
-          --gram ${1} \\
-          --reference_outdir ../../REFERENCES \\
-	  --save_trimmed false \\
+          --gram $1 \\
+	      --save_trimmed true \\
           --kmerfinder_bacteria_database '/data/bi/references/kmerfinder/20190108_stable_dirs/bacteria' \\
           --reference_ncbi_bacteria '/data/bi/references/bacteria/latest_db/assembly_summary_bacteria.txt' \\
           -resume
 EOF
 
 echo "sbatch assembly.sbatch" > _01_nf_assembly.sh
-
-
