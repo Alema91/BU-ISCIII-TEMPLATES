@@ -1,10 +1,10 @@
 if [[ "$#" -ne 1 ]]; then
-    echo "\033[0;31mNumber of params inappropriate, only admitted param is the gram of the bacteria you are working with\033[0m"
+    echo "Number of params inappropriate, only admitted param is the gram of the bacteria you are working with"
     exit 1
 fi
 
 if [[ "$1" != "+" && "$1" != "-" ]]; then
-    echo "\033[0;31mThe given param: '$1' does not match any of the accepted params ('+' or '-')\033[0m"
+    echo "The given param: '$1' does not match any of the accepted params ('+' or '-')"
     exit 1
 fi
 
