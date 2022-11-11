@@ -1,5 +1,6 @@
 # conda activate mtbseq
 # srun parameters
+mkdir logs
 scratch_dir=$(echo $(pwd) | sed "s@/data/bi/scratch_tmp/@/scratch/@g")
 
 cat ../samples_id.txt | xargs -I % echo "mkdir %; ln -s ../*ASSEMBLY/01-preprocessing/trimmed_sequences/%_1.trim.fastq.gz %/%_lib1_R1.fastq.gz" > _00_prepareRaw.sh
