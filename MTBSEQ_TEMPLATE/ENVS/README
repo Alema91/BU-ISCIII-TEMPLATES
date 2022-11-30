@@ -1,0 +1,3 @@
+This directory contains the environments needed for mtbseq to run.
+This security copy (tagged as 2022-11-30)  was made before installing java 1.8 with conda "conda install -c anaconda java-1.8.0-openjdk-devel-cos7-s390x".
+java 1.8 was installed for the "all_samples" section of the service to work (and it did).
