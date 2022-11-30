@@ -1,0 +1,14 @@
+# module load picard
+# conda activate samtools
+
+scratch_dir=$(echo $PWD | sed 's/\/data\/bi\/scratch_tmp/\/scratch/g')
+ln -s ../../../REFERENCES/*.fna reference.fna
+
+mkdir -p logs
+
+cat ../samples_id.txt | xargs -I @@ echo "srun --chdir $scratch_dir --output logs/PICARD_@@.%j.log --job-name picard_@@ --partition short_idx --time 2:00:00 java -jar $EBROOTPICARD/picard.jar CollectWgsMetrics -VALIDATION_STRINGENCY LENIENT -I../04-snippy/@@/snps.bam -O @@_collect_wgs_metrics.txt -R reference &" > _00_wgsmetrics.sh
+cat ../samples_id.txt | xargs -I % echo "printf '%s\t' %;samtools flagstat ../04-snippy/%/snps.bam | grep 'mapped (' | cut -d '(' -f 2 | cut -d ':' -f 1" | bash | sort -u > mapping_stats.txt
+echo "cat ../samples_id.txt | xargs -I % echo \"printf '%s\t' %;grep '^5369772' %_collect_wgs_metrics.txt | cut -f 2,3,14,15,16\" | bash > wgs_metrics_all.txt" > _01_gather_wgs_metrics.sh
+echo "paste mapping_stats.txt wgs_metrics_all.txt | cut -f 1,2,4-8 > mapping_stats_summary.txt" > _02_generate_summary.sh
+echo "grep -P "^\d+" ../04-snippy/logs/*CORE* | sed 's/ \+/\t/g'  | cut -f 3,4,5,6 | tr '\t' ';' > variants_stats.txt" _03_variants_stats.sh
+
