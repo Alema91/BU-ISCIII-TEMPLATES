@@ -14,7 +14,7 @@ echo "cat ../samples_id.txt | xargs -I % echo \"printf '%s\t' %; head -n 8 %_col
 echo "cut -f 1,2,3,14,15,16 wgs_metrics_all.txt > wgs_metrics_all_filtered.txt" >> _01_gather_wgs_metrics.sh
 
 echo "printf 'SAMPLENAME\tMAPPING\n' > header; cat header mapping_stats.txt > tmp; rm header mapping_stats.txt; mv tmp mapping_stats.txt" > _02_generate_summary.sh 
-echo "join -j 1 mapping_stats.txt wgs_metrics_all.txt | sed 's/  /\t/g' | sed 's/ /;/g' | cut -f 1,2,4-8 > mapping_stats_summary.txt" >> _02_generate_summary.sh
+echo "join -j 1 mapping_stats.txt wgs_metrics_all.txt | sed 's/\t/ /g' | sed 's/ /;/g' | cut -f 1,2,4-8 > mapping_stats_summary.txt" >> _02_generate_summary.sh
 
 echo " printf 'SAMPLENAME;SNP;DEL;INS;HET\n' > variants_stats.txt" > _03_variants_stats.sh
 echo "grep ^[0-9] ../04-snippy/logs/*CORE* | sed 's/ \+/\t/g'  | cut -f 2,3,4,5,6 | sed 's/snp=//g' | sed 's/del=//g' | sed 's/ins=//g' | sed 's/het=//g'  | sort -u | tr '\t' ';' >> variants_stats.txt" >> _03_variants_stats.sh
