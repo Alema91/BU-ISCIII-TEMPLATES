@@ -4,7 +4,7 @@ mkdir 03-preprocQC
 mkdir 04-snippy
 mkdir 05-iqtree
 mkdir 99-stats
-mkdir logs
+
 ln -s ../samples_id.txt .
 ln -s ../00-reads .
 
