@@ -1,5 +1,5 @@
-# 01-fastQC_previous
-# fastQC to assess the raw reads quality
 # conda activate quality_control
+# 03-fastQC_post
+# fastQC to assess the raw reads quality
 scratch_dir=$(echo $(pwd) | sed "s@/data/bi/scratch_tmp/@/scratch/@g")
 cat ../samples_id.txt | xargs -I % echo "mkdir %; srun --partition middle_idx --cpus-per-task 1 --chdir $scratch_dir fastqc --threads 1 -o % ../02-fastp-trim/%/%*.fastq.gz 2> %/%_fastqc_post.log &" > _01_fastqc_post_trimming.sh

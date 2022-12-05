@@ -1,3 +1,6 @@
+# conda activate samtools
+# NOTE: env includes bowtie
+
 # srun parameters
 scratch_dir=$(echo $(pwd) | sed "s@/data/bi/scratch_tmp/@/scratch/@g")
 mkdir logs

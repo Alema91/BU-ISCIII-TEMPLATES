@@ -1,4 +1,4 @@
-#module load BLAST
+# module load BLAST
 mkdir logs
 scratch_dir=$(echo $(pwd) | sed 's@/data/bi/scratch_tmp/@/scratch/@g')
 

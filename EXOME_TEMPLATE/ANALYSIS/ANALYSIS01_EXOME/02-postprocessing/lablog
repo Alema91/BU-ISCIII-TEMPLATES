@@ -1,4 +1,4 @@
-#conda activate nf-core-sarek-2.7.1
+# conda activate nf-core-sarek-2.7.1
 
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 

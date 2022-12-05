@@ -1,3 +1,5 @@
+# conda activate quality_control
+
 mkdir logs
 
 ln -s ../01-fastQC-pre fastqc_pre

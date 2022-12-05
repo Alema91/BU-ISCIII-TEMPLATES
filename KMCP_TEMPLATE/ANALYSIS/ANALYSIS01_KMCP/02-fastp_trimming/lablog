@@ -1,6 +1,6 @@
+# conda activate quality_control
 # 02-fastp-trim
 # FastP to trim the raw reads
-# conda activate quality_control
 scratch_dir=$(echo $(pwd) | sed "s@/data/bi/scratch_tmp/@/scratch/@g")
 mkdir logs
 cat ../samples_id.txt | xargs -I % echo "mkdir %; srun --partition middle_idx --cpus-per-task 5 --chdir $scratch_dir fastp --in1 ../00-reads/%_R1.fastq.gz --in2 ../00-reads/%_R2.fastq.gz --out1 %/%_trimmed_R1.fastq.gz --out2 %/%_trimmed_R2.fastq.gz --cut_front --cut_tail --cut_mean_quality 30 --qualified_quality_phred 30 --unqualified_percent_limit 10 --length_required 50 --trim_poly_x --thread 5 --json %/%_fastp.json --html %/%_fastp.html 2> %/%_fastp.log &" > _01_fastp_trimming.sh

@@ -1,7 +1,7 @@
+# module load Nextflow singularity
+
 ln -s ../00-reads .
 ln -s ../samples_id.txt .
-
-#module load Nextflow singularity
 
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 

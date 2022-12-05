@@ -1,6 +1,7 @@
+
+# NOT FINISHED
 ##!/bin/bash
 # ARIBA runs local assembli/processing_Data/bioinformatics/services_and_colaborations/CNM/bacteriologia/20190821_QCASSEMBLT_s.gonzalez_T/RAW/fastqc_2/.
-
 
 for sample in $(cat ../../samples_id_failed.txt); do
 
