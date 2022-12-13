@@ -1,3 +1,5 @@
+# conda activate nf-core-sarek-2.7.1
+
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
 ln -s /data/bi/references/eukaria/homo_sapiens/cache_vep/custom_databases/dbNSFP/GRCh37/dbNSFP_ENSG_gene_GRCh37.txt .
