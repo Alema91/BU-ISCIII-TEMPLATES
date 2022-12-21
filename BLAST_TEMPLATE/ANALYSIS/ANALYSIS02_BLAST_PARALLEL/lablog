@@ -21,13 +21,13 @@
 # 18: %refCovered
 # MORE INFO: https://www.metagenomics.wiki/tools/blast/blastn-output-format-6
 # Remember to change the target_location variable if not correct!
-# The seqs_per_chunk is the number of 
+# The seqs_per_process is the max number of sequence per BLAST process (careful with I/O errors)
 
 
 mkdir logs
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 target_location="$(pwd)/../../RAW"
-seqs_per_chunk =
+seqs_per_chunk=10
 
 
 mkdir logs
