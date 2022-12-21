@@ -1,0 +1,64 @@
+# module load BLAST+/2.11.0-gompi-2020b
+
+# header:
+#  1: stitle
+#  2: qaccver
+#  3: saccver
+#  4: pident
+#  5: length
+#  6: ismatch
+#  7: gapopen
+#  8: qstart
+#  9: qend
+# 10: sstart
+# 11: send
+# 12: evalue
+# 13: bitscore
+# 14: slen
+# 15: qlen
+# 16: qcovs
+# 17: %cgAligned
+# 18: %refCovered
+# MORE INFO: https://www.metagenomics.wiki/tools/blast/blastn-output-format-6
+# Remember to change the target_location variable if not correct!
+# The seqs_per_chunk is the number of 
+
+
+mkdir logs
+scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+target_location="$(pwd)/../../RAW"
+seqs_per_chunk =
+
+
+mkdir logs
+ls ${target_location}/*.fasta | xargs -I @@ echo "readlink -e @@" | bash > BLAST_list.txt
+ls ${target_location}/*.gz | xargs -I @@ echo "readlink -e @@" | bash >> BLAST_list.txt
+
+# Create empty script to avoid stacking on the loops
+: > _01_blast.sh
+: > _02_filter_blast.sh
+: > chunk_list.sh
+
+cat BLAST_list.txt | while read in;
+do
+    samplename=$(echo ${in} | cut -d"." -f1)
+    mkdir ${samplename}
+    if [[ $in =~ \.t?gz$ ]];
+    then
+        gunzip -c ${in} > ${samplename}/${samplename}.fasta
+    else
+        cp ${in} ${samplename}/${samplename}.fasta
+    fi
+    echo "awk 'BEGIN {n=0;} /^>/ {if(n%500==0){file=sprintf("${samplename}_chunk_%d.fasta",n);} print >> file; n++; next;} { print >> file; }' < ${samplename}/${samplename}.fasta" | bash
+    echo "srun --chdir ${scratch_dir} --partition middle_idx --mem 376530M --time 48:00:00 --cpus-per-task 10 --output logs/BLASTN_${samplename}_%j.log --job-name BLASTN_${samplename} blastn -num_threads 10 -db /data/bi/references/BLAST_dbs/nt_20211025/nt -query ${samplename}/${samplename}.fasta -out ${samplename}/${samplename}_blast.tab -outfmt '6 qseqid stitle std slen qlen qcovs' &" >> _01_blast.sh
+done
+
+cat BLAST_list.txt | while read in; 
+do
+	samplename=$(echo ${in} | cut -d"." -f1)
+	echo "awk -v \"samplename=$samplename\" 'BEGIN{OFS=\"\t\";FS=\"\t\"}{print samplename\$0,\$5/\$15,\$5/\$14}' ${samplename}/${samplename}_blast.tab | awk 'BEGIN{OFS=\"\t\";FS=\"\t\"} \$15 > 200 && \$17 > 0.7 && \$1 !~ /phage/ {print \$0}' > ${samplename}/${samplename}_blast_filt.tab" >> _02_filter_blast.sh
+done
+
+echo "echo \"samplename\tqueryname\tstitle\tqaccver\tsaccver\tpident\tlength\tmismatch\tgapopen\tqstart\tqend\tsstart\tsend\tevalue\tbitscore\tslen\tqlen\tqcovs\t%cgAligned\t%refCovered\" > header" > _03_gather_results.sh
+echo "cat header */*blast_filt.tab > all_samples_filtered_BLAST_results.tab" >> _03_gather_results.sh
+echo "rm header" >> _03_gather_results.sh
