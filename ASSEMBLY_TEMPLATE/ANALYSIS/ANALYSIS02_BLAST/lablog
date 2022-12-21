@@ -1,0 +1,25 @@
+# module load BLAST+/2.11.0-gompi-2020b
+scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
+mkdir logs
+ls ../*ASSEMBLY/03-assembly/unicycler/*.fasta | xargs -I @@ echo "readlink -e @@" | bash > BLAST_list.txt
+
+# Create empty script to avoid stacking on the loops
+: > _01_blast.sh
+: > _02_filter_blast.sh
+
+cat BLAST_list.txt | while read in;
+do
+	samplename=$(basename ${in} .fasta)
+	mkdir $samplename
+	echo "srun --chdir ${scratch_dir} --partition middle_idx --mem 376530M --time 48:00:00 --cpus-per-task 10 --output logs/BLASTN_${samplename}_%j.log --job-name BLASTN_${samplename} blastn -num_threads 10 -db /data/bi/references/BLAST_dbs/nt_20211025 -query ${in} -out ${samplename}/${samplename}_blast.tab -outfmt '6 stitle std slen qlen qcovs' &" >> _01_blast.sh
+done
+
+cat BLAST_list.txt | while read in; 
+do
+	samplename=$(basename ${in} .fasta)
+	echo "awk 'BEGIN{OFS=\"\t\";FS=\"\t\"}{print \$0,\$5/\$15,\$5/\$14}' ${samplename}/${samplename}_blast.tab | awk 'BEGIN{OFS=\"\t\";FS=\"\t\"} \$15 > 200 && \$17 > 0.7 && \$1 !~ /phage/ {print \$0}' > ${samplename}/${samplename}_blast_filt.tab" >> _02_filter_blast.sh
+done
+
+echo "echo \"stitle\tqaccver\tsaccver\tpident\tlength\tmismatch\tgapopen\tqstart\tqend\tsstart\tsend\tevalue\tbitscore\tslen\tqlen\tqcovs\t%cgAligned\t%refCovered\" > header" > _03_gather_results.sh
+echo "cat header */*blast_filt.tab > all_samples_filtered_BLAST_results.tab" >> _03_gather_results.sh
+echo "rm header" >> _03_gather_results.sh
