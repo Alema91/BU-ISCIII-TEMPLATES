@@ -1,6 +1,4 @@
-# module load BLAST
-mkdir logs
-scratch_dir=$(echo $(pwd) | sed 's@/data/bi/scratch_tmp/@/scratch/@g')
+# module load BLAST+/2.11.0-gompi-2020b
 
 # header:
 #  1: stitle
@@ -22,20 +20,39 @@ scratch_dir=$(echo $(pwd) | sed 's@/data/bi/scratch_tmp/@/scratch/@g')
 # 17: %cgAligned
 # 18: %refCovered
 
+mkdir logs
+scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 
-echo -e "stitle\tqaccver\tsaccver\tpident\tlength\tmismatch\tgapopen\tqstart\tqend\tsstart\tsend\tevalue\tbitscore\tslen\tqlen\tqcovs\t%cgAligned\t%refCovered" > header
+# Remember to change the target location if not correct!
+target_location="$(pwd)/../../RAW"
 
+mkdir logs
+ls ${target_location}/*.fasta | xargs -I @@ echo "readlink -e @@" | bash > BLAST_list.txt
+ls ${target_location}/*.gz | xargs -I @@ echo "readlink -e @@" | bash >> BLAST_list.txt
 
-cat ../samples_id.txt | while read in; do ASSEMBLY=$(find ../*viralrecon/assembly/spades/meta/${in}.scaffolds.fa); echo "srun --chdir ${scratch_dir} --job-name BLAST_scaffolds.${in} --output logs/BLAST_scaffolds.${in}.%j.log --cpus-per-task 10 blastn -num_threads 10 -db /data/bi/references/virus/BLAST/all_virus.fasta -query ${ASSEMBLY} -outfmt \"6 stitle std slen qlen qcovs\" -out ${in}_scaffolds.blast.txt &"; done > _01_blast.sh
-cat ../samples_id.txt | while read in; do ASSEMBLY=$(find ../*viralrecon/assembly/spades/meta/${in}.contigs.fa); echo "srun --chdir ${scratch_dir} --job-name BLAST_contigs.${in} --output logs/BLAST_contigs.${in}.%j.log --cpus-per-task 10 blastn -num_threads 10 -db /data/bi/references/virus/BLAST/all_virus.fasta -query ${ASSEMBLY} -outfmt \"6 stitle std slen qlen qcovs\" -out ${in}_contigs.blast.txt &"; done >> _01_blast.sh
+# Create empty script to avoid stacking on the loops
+: > _01_blast.sh
+: > _02_filter_blast.sh
 
+cat BLAST_list.txt | while read in;
+do
+    samplename=$(echo ${in} | cut -d"." -f1)
+    mkdir ${samplename}
+    if [[ $in =~ \.t?gz$ ]];
+    then
+        gunzip -c ${in} > ${samplename}/${samplename}.fasta
+    else
+        cp ${in} ${samplename}/${samplename}.fasta
+    fi
+    echo "srun --chdir ${scratch_dir} --partition middle_idx --mem 376530M --time 48:00:00 --cpus-per-task 10 --output logs/BLASTN_${samplename}_%j.log --job-name BLASTN_${samplename} blastn -num_threads 10 -db /data/bi/references/BLAST_dbs/nt_20211025/nt -query ${samplename}/${samplename}.fasta -out ${samplename}/${samplename}_blast.tab -outfmt '6 stitle std slen qlen qcovs' &" >> _01_blast.sh
+done
 
-cat ../samples_id.txt | while read in; do echo "awk 'BEGIN{OFS=\"\t\";FS=\"\t\"}{print \$0,\$5/\$15,\$5/\$14}' ${in}_scaffolds.blast.txt | awk 'BEGIN{OFS=\"\t\";FS=\"\t\"} \$15 > 200 && \$17 > 0.7 && \$1 !~ /phage/ {print \$0}' > ${in}.blast_scaffolds.filt.txt"; done > _02_filt_blast.sh
-cat ../samples_id.txt | while read in; do echo "awk 'BEGIN{OFS=\"\t\";FS=\"\t\"}{print \$0,\$5/\$15,\$5/\$14}' ${in}_contigs.blast.txt | awk 'BEGIN{OFS=\"\t\";FS=\"\t\"} \$15 > 200 && \$17 > 0.7 && \$1 !~ /phage/ {print \$0}' > ${in}.blast_contigs.filt.txt"; done >> _02_filt_blast.sh
+cat BLAST_list.txt | while read in; 
+do
+	samplename=$(echo ${in} | cut -d"." -f1)
+	echo "awk 'BEGIN{OFS=\"\t\";FS=\"\t\"}{print \$0,\$5/\$15,\$5/\$14}' ${samplename}/${samplename}_blast.tab | awk 'BEGIN{OFS=\"\t\";FS=\"\t\"} \$15 > 200 && \$17 > 0.7 && \$1 !~ /phage/ {print \$0}' > ${samplename}/${samplename}_blast_filt.tab" >> _02_filter_blast.sh
+done
 
-
-cat ../samples_id.txt | while read in; do echo "cat header ${in}.blast_scaffolds.filt.txt > ${in}_scaffolds.blast.filt.header.txt";done > _03_header.sh
-cat ../samples_id.txt | while read in; do echo "cat header ${in}.blast_contigs.filt.txt > ${in}_contigs.blast.filt.header.txt";done >> _03_header.sh
-
-cat ../samples_id.txt | while read in; do echo "cat header ${in}_scaffolds.blast.txt > ${in}_scaffolds.blast.raw.header.txt";done >> _03_header.sh
-cat ../samples_id.txt | while read in; do echo "cat header ${in}_contigs.blast.txt > ${in}_contigs.blast.raw.header.txt";done >> _03_header.sh
+echo "echo \"stitle\tqaccver\tsaccver\tpident\tlength\tmismatch\tgapopen\tqstart\tqend\tsstart\tsend\tevalue\tbitscore\tslen\tqlen\tqcovs\t%cgAligned\t%refCovered\" > header" > _03_gather_results.sh
+echo "cat header */*blast_filt.tab > all_samples_filtered_BLAST_results.tab" >> _03_gather_results.sh
+echo "rm header" >> _03_gather_results.sh
