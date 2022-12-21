@@ -29,6 +29,7 @@ ls ../*ASSEMBLY/03-assembly/unicycler/*.fasta | xargs -I @@ echo "readlink -e @@
 : > _01_blast.sh
 : > _02_filter_blast.sh
 
+# looks like copying is the only way to avoid the "cant access" error 
 cat BLAST_list.txt | while read in;
 do
 	samplename=$(basename ${in} .fasta)
@@ -40,9 +41,10 @@ done
 cat BLAST_list.txt | while read in; 
 do
 	samplename=$(basename ${in} .fasta)
-	echo "awk -v \"samplename=$samplename\" 'BEGIN{OFS=\"\t\";FS=\"\t\"}{print samplename,\$0,\$5/\$15,\$5/\$14}' ${samplename}/${samplename}_blast.tab | awk 'BEGIN{OFS=\"\t\";FS=\"\t\"} \$15 > 200 && \$17 > 0.7 && \$1 !~ /phage/ {print \$0}' > ${samplename}/${samplename}_blast_filt.tab" >> _02_filter_blast.sh
+	echo "awk 'BEGIN{OFS=\"\t\";FS=\"\t\"}{print \$0,\$5/\$15,\$5/\$14}' ${samplename}/${samplename}_blast.tab | awk -v \"samplename=$samplename\" 'BEGIN{OFS=\"\t\";FS=\"\t\"} \$15 > 200 && \$17 > 0.7 && \$1 !~ /phage/ {print samplename,\$0}' > ${samplename}/${samplename}_blast_filt.tab" >> _02_filter_blast.sh
 done
 
 echo -e "echo \"samplename\tcontigname\tstitle\tqaccver\tsaccver\tpident\tlength\tmismatch\tgapopen\tqstart\tqend\tsstart\tsend\tevalue\tbitscore\tslen\tqlen\tqcovs\t%cgAligned\t%refCovered\" > header" > _03_gather_results.sh
 echo "cat header */*blast_filt.tab > all_samples_filtered_BLAST_results.tab" >> _03_gather_results.sh
 echo "rm header" >> _03_gather_results.sh
+echo "rm */*.fasta" >> _03_gather_results.sh
