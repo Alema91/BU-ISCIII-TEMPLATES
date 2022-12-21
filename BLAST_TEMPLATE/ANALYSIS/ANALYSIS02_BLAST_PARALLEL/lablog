@@ -27,7 +27,7 @@
 mkdir logs
 scratch_dir=$(echo $PWD | sed "s/\/data\/bi\/scratch_tmp/\/scratch/g")
 target_location="$(pwd)/../../RAW"
-seqs_per_chunk=10
+seqs_per_chunk=50
 
 
 mkdir logs
@@ -49,7 +49,7 @@ do
     else
         cp ${in} ${samplename}/${samplename}.fasta
     fi
-    echo "awk 'BEGIN {n=0;} /^>/ {if(n%500==0){file=sprintf("${samplename}_chunk_%d.fasta",n);} print >> file; n++; next;} { print >> file; }' < ${samplename}/${samplename}.fasta" | bash
+    echo "awk -v \"seqs_per_chunk=$seqs_per_chunk\" 'BEGIN {n=0;} /^>/ {if(n%seqs_per_chunk==0){file=sprintf("${samplename}_chunk_%d.fasta",n);} print >> file; n++; next;} { print >> file; }' < ${samplename}/${samplename}.fasta" | bash
     echo "srun --chdir ${scratch_dir} --partition middle_idx --mem 376530M --time 48:00:00 --cpus-per-task 10 --output logs/BLASTN_${samplename}_%j.log --job-name BLASTN_${samplename} blastn -num_threads 10 -db /data/bi/references/BLAST_dbs/nt_20211025/nt -query ${samplename}/${samplename}.fasta -out ${samplename}/${samplename}_blast.tab -outfmt '6 qseqid stitle std slen qlen qcovs' &" >> _01_blast.sh
 done
 
