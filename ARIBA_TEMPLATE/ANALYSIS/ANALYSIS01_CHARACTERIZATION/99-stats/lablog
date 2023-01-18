@@ -1,0 +1,5 @@
+# conda activate python3
+mkdir logs
+scratch_dir=$(echo $PWD | sed 's/\/data\/bi\/scratch_tmp/\/scratch/g')
+
+cat ../03-ariba/databases.txt | xargs -I @@ echo "python3 /data/bi/pipelines/bacterial_qc/parse_ariba.py --path ../03-ariba/summary/out_summary_@@.csv --database @@ --output_bn ariba_@@.bn --output_csv ariba_@@.csv" > _01_python_ariba_stats.sh
