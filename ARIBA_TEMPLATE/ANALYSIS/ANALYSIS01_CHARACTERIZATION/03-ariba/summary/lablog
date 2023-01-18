@@ -1,0 +1,21 @@
+#Ariba summarise data from several runs. View the results in Phandango by dragging and dropping the files out.summary.phandango.tre and out.summary.phandango.csv into the Phandago window.
+
+folder_run="../run"
+
+
+for i in $(cat ../../samples_id.txt); do
+
+    for j in $(cat ../databases.txt); do
+       echo "$folder_run"/"$i"/out."$j""$i"run/"$i""$j"report.tsv | awk '//$/j/ {print $0}' >> file"$j".txt
+       sed -i ':a;N;s/\n/ /g' file"$j".txt
+    done
+done
+
+
+for j in $(cat ../databases.txt); do
+    while IFS= read -r line
+    do
+        echo ariba summary --cluster_cols ref_seq,match out.summary"$j" "$line" >> _01_run.sh
+    done < "file"$j".txt"
+    rm -rf file"$j".txt file.txt
+done
